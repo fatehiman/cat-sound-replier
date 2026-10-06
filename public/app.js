@@ -4,7 +4,7 @@
 // so a reply is scheduled as soon as the cat class wins, not when the sound ends.
 
 const $ = id => document.getElementById(id);
-const CLASS_SPEECH = 0, CLASS_CAT = 76, CLASS_PURR = 77, CLASS_MEOW = 78, CLASS_CATERWAUL = 80;
+const CLASS_SPEECH = 0, CLASS_CAT = 76, CLASS_MEOW = 78, CLASS_CATERWAUL = 80;
 const YAMNET_SAMPLES = 15600;          // 0.975 sec at 16 kHz
 const INFER_EVERY_MS = 150;
 const RING_SECONDS = 12;
@@ -148,8 +148,9 @@ async function infer() {
     const scores = await out.data();
     out.dispose();
     if (!listening || state !== 'idle') return;
-    const cat = Math.max(scores[CLASS_CAT], scores[CLASS_MEOW], scores[CLASS_CATERWAUL]);
-    const speech = scores[CLASS_SPEECH];
+    const sig = v => 1 / (1 + Math.exp(-v));                  // model gives logits
+    const cat = sig(Math.max(scores[CLASS_CAT], scores[CLASS_MEOW], scores[CLASS_CATERWAUL]));
+    const speech = sig(scores[CLASS_SPEECH]);
     const thr = 0.7 - 0.07 * Number(el.sens.value);           // 1 -> 0.63 ... 9 -> 0.07
     el.debug.textContent = `cat ${cat.toFixed(2)} (need ${thr.toFixed(2)}) · speech ${speech.toFixed(2)}`;
     // the newest 0.3 sec must be louder than the room, so an old meow in the window does not count
