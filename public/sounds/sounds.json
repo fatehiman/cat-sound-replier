@@ -1,0 +1,12 @@
+[
+  {"file": "cat-meow-1.mp3", "name": "Cat meow 1 (young female)"},
+  {"file": "cat-meow-2-siamese.mp3", "name": "Cat meow 2 (Siamese)"},
+  {"file": "cat-meow-3-pleading.mp3", "name": "Cat meow 3 (pleading)"},
+  {"file": "cat-meow-4-cornish.mp3", "name": "Cat meow 4 (Cornish Rex)"},
+  {"file": "cat-hiss.mp3", "name": "Cat hiss"},
+  {"file": "cat-purr.mp3", "name": "Cat purr"},
+  {"file": "beep-short.mp3", "name": "Beep (short)"},
+  {"file": "beep-low.mp3", "name": "Beep (low)"},
+  {"file": "beep-high.mp3", "name": "Beep (high)"},
+  {"file": "beep-double.mp3", "name": "Beep (double)"}
+]

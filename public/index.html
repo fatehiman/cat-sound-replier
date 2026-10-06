@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cat Sound Replier</title>
+<meta name="description" content="Listens with your microphone. When it hears a cat, it answers quickly with a sound.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <h1>🐱 Cat Sound Replier</h1>
+  <p class="sub">Press <b>Listen</b>. When your cat meows, this page answers fast. Human voice is ignored.</p>
+
+  <button id="listen" class="big">🎤 Listen</button>
+  <div id="status" class="status">Not listening.</div>
+
+  <div class="meter"><div id="level"></div></div>
+  <div id="debug" class="debug"></div>
+
+  <section class="opts">
+    <h2>Options</h2>
+
+    <label class="row">
+      <span>Delay before reply (seconds)</span>
+      <input id="delay" type="number" min="0" max="30" step="0.1" value="1">
+    </label>
+
+    <div class="row">
+      <label class="chk"><input id="silentOn" type="checkbox"> Wait for silence first, for</label>
+      <select id="silentSec"></select>
+      <span>sec</span>
+    </div>
+    <p class="hint" id="silentHint">Off: reply after the delay above. On: reply after N seconds of silence (the delay is not used).</p>
+
+    <div class="row">
+      <span>Play sound mode</span>
+      <select id="mode">
+        <option value="specific">Play specific sound</option>
+        <option value="repeat">Repeat received sound</option>
+      </select>
+      <select id="sound"></select>
+      <button id="preview" type="button" class="small" title="Play this sound now">▶</button>
+    </div>
+
+    <label class="row">
+      <span>Cat detection sensitivity</span>
+      <input id="sens" type="range" min="1" max="9" step="1" value="5">
+    </label>
+    <label class="row">
+      <span>Volume</span>
+      <input id="vol" type="range" min="0" max="1" step="0.05" value="1">
+    </label>
+  </section>
+
+  <p class="foot">Audio stays in your browser. Nothing is uploaded.
+    · <a href="https://github.com/fatehiman/cat-sound-replier">Source</a></p>
+</main>
+<script src="lib/tf.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
