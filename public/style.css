@@ -15,9 +15,11 @@ button{font:inherit;cursor:pointer}
 .meter{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
 #level{height:100%;width:0;background:var(--accent);transition:width .08s}
 .debug{margin:6px 0 0;font-size:13px;color:var(--mute);min-height:1.4em}
+
 .opts{margin-top:24px;padding:16px;background:var(--card);border:1px solid var(--line);border-radius:14px}
 .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0}
 .row>span:first-child{flex:1 1 200px}
+.opts.detect{margin:0 0 16px}
 .chk{display:flex;align-items:center;gap:8px}
 input[type=number],select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
 input[type=number]{width:90px}

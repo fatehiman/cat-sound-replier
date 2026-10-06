@@ -14,10 +14,10 @@ Human voice is ignored. No login. Live at https://cat.peppasoft.com
 ## Options
 | Option | Meaning |
 |---|---|
+| Detect (top of page) | `Cat sound` (uses the AI model; set **Cat sensitivity** 1-9) or `Any sound` (any sound louder than **Minimum volume**, -70 to -10 dB; reacts at once). The page shows the live dB number to help you set it. |
 | Delay before reply | Seconds after the cat sound is detected. Default 1. |
 | Wait for silence (checkbox + 1-10 sec) | Off by default. If on, reply after N seconds of silence. The delay is not used then. |
 | Play sound mode | `Play specific sound` (pick from the list next to it) or `Repeat received sound` (plays back what the mic heard; no second list). |
-| Sensitivity | Lower number = fewer false alarms. Higher = detects more. |
 | Volume | Reply volume. |
 
 Settings are saved in the browser (localStorage).

@@ -13,13 +13,15 @@ const MAX_SILENCE_WAIT_MS = 20000;
 
 const el = {
   listen: $('listen'), status: $('status'), level: $('level'), debug: $('debug'),
+  detect: $('detect'), minDb: $('minDb'), sensVal: $('sensVal'), dbVal: $('dbVal'),
+  rowSens: $('rowSens'), rowDb: $('rowDb'), detectHint: $('detectHint'),
   delay: $('delay'), silentOn: $('silentOn'), silentSec: $('silentSec'),
   mode: $('mode'), sound: $('sound'), preview: $('preview'), sens: $('sens'), vol: $('vol'),
 };
 
 // ---------- settings ----------
 for (let i = 1; i <= 10; i++) el.silentSec.add(new Option(i, i));
-const FIELDS = ['delay', 'silentOn', 'silentSec', 'mode', 'sound', 'sens', 'vol'];
+const FIELDS = ['detect', 'minDb', 'delay', 'silentOn', 'silentSec', 'mode', 'sound', 'sens', 'vol'];
 function saveSettings() {
   try {
     const o = {};
@@ -37,12 +39,21 @@ function loadSettings() {
   } catch (e) { /* ignore */ }
 }
 function applyUi() {
+  const cat = el.detect.value === 'cat';
+  el.rowSens.hidden = !cat;
+  el.rowDb.hidden = cat;
+  el.sensVal.textContent = el.sens.value + ' / 9';
+  el.dbVal.textContent = el.minDb.value + ' dB';
+  el.detectHint.textContent = cat
+    ? 'Replies only when it hears a cat. Move the slider right if it does not react.'
+    : 'Replies to any sound louder than the minimum volume. Move the slider left to hear quieter sounds.';
   el.sound.hidden = el.preview.hidden = el.mode.value !== 'specific';
   el.silentSec.disabled = !el.silentOn.checked;
   el.delay.disabled = el.silentOn.checked;
 }
 FIELDS.forEach(k => el[k].addEventListener('change', () => { applyUi(); saveSettings(); }));
 el.delay.addEventListener('input', saveSettings);
+['sens', 'minDb'].forEach(k => el[k].addEventListener('input', () => { applyUi(); saveSettings(); }));
 
 // ---------- state ----------
 let ctx = null, stream = null, srcNode = null, workletNode = null, model = null;
@@ -107,6 +118,17 @@ function onChunk(chunk) {
     lastLoudAt = now;
   }
   el.level.style.width = Math.min(100, lastRms * 600) + '%';
+  const db = 20 * Math.log10(Math.max(lastRms, 1e-6));
+  if (listening && !calib && state === 'idle') {
+    if (el.detect.value === 'any') {
+      const min = Number(el.minDb.value);
+      el.debug.textContent = `volume ${db.toFixed(0)} dB (need ${min} dB)`;
+      if (db >= min && total > ignoreBefore + n) {
+        const count = Math.round(sr * 0.5);
+        onCat(total, readRing(total, count), 1, true);
+      }
+    }
+  }
 }
 
 // last `count` samples that end at `end` (absolute sample index), as a new array
@@ -131,7 +153,7 @@ function resampleTo16k(x) {
 
 // ---------- detection ----------
 async function infer() {
-  if (!listening || inferBusy || state !== 'idle' || !model || calib) return;
+  if (!listening || inferBusy || state !== 'idle' || !model || calib || el.detect.value !== 'cat') return;
   inferBusy = true;
   try {
     const end = total;
@@ -151,23 +173,24 @@ async function infer() {
     const sig = v => 1 / (1 + Math.exp(-v));                  // model gives logits
     const cat = sig(Math.max(scores[CLASS_CAT], scores[CLASS_MEOW], scores[CLASS_CATERWAUL]));
     const speech = sig(scores[CLASS_SPEECH]);
-    const thr = 0.7 - 0.07 * Number(el.sens.value);           // 1 -> 0.63 ... 9 -> 0.07
-    el.debug.textContent = `cat ${cat.toFixed(2)} (need ${thr.toFixed(2)}) · speech ${speech.toFixed(2)}`;
+    const thr = 0.55 - 0.055 * Number(el.sens.value);         // 1 -> 0.50 ... 9 -> 0.05
+    el.debug.textContent = `cat ${cat.toFixed(2)} (need ${thr.toFixed(2)}) · speech ${speech.toFixed(2)} · ${(20 * Math.log10(Math.max(lastRms, 1e-6))).toFixed(0)} dB`;
     // the newest 0.3 sec must be louder than the room, so an old meow in the window does not count
     const recent = readRing(end, Math.round(sr * 0.3));
     let s = 0; for (const v of recent) s += v * v;
     const recentRms = Math.sqrt(s / recent.length);
-    if (cat >= thr && cat > speech && recentRms > noiseFloor * 1.5) onCat(end, win, cat);
+    if (cat >= thr && cat > speech * 0.8 && recentRms > noiseFloor * 1.2) onCat(end, win, cat);
   } catch (e) {
     console.error(e);
+    el.debug.textContent = 'Detector error: ' + (e && e.message || e);
   } finally {
     inferBusy = false;
   }
 }
 
-function onCat(end, win, cat) {
+function onCat(end, win, cat, any) {
   state = 'pending';
-  el.status.textContent = `🐱 Cat heard! (${Math.round(cat * 100)}%)`;
+  el.status.textContent = any ? '🔔 Sound heard!' : `🐱 Cat heard! (${Math.round(cat * 100)}%)`;
   el.status.classList.add('hit');
   // guess where the sound began: first 20 ms block clearly louder than the room
   const blk = Math.round(sr * 0.02);

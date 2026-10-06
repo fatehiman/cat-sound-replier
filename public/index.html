@@ -6,12 +6,31 @@
 <title>Cat Sound Replier</title>
 <meta name="description" content="Listens with your microphone. When it hears a cat, it answers quickly with a sound.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
-<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 <main>
   <h1>🐱 Cat Sound Replier</h1>
   <p class="sub">Press <b>Listen</b>. When your cat meows, this page answers fast. Human voice is ignored.</p>
+
+  <section class="opts detect">
+    <div class="row">
+      <span>Detect</span>
+      <select id="detect">
+        <option value="cat">Cat sound</option>
+        <option value="any">Any sound</option>
+      </select>
+    </div>
+    <label class="row" id="rowSens">
+      <span>Cat sensitivity: <b id="sensVal"></b></span>
+      <input id="sens" type="range" min="1" max="9" step="1" value="6">
+    </label>
+    <label class="row" id="rowDb" hidden>
+      <span>Minimum volume: <b id="dbVal"></b></span>
+      <input id="minDb" type="range" min="-70" max="-10" step="1" value="-40">
+    </label>
+    <p class="hint" id="detectHint"></p>
+  </section>
 
   <button id="listen" class="big">🎤 Listen</button>
   <div id="status" class="status">Not listening.</div>
@@ -45,10 +64,6 @@
     </div>
 
     <label class="row">
-      <span>Cat detection sensitivity</span>
-      <input id="sens" type="range" min="1" max="9" step="1" value="5">
-    </label>
-    <label class="row">
       <span>Volume</span>
       <input id="vol" type="range" min="0" max="1" step="0.05" value="1">
     </label>
@@ -58,6 +73,6 @@
     · <a href="https://github.com/fatehiman/cat-sound-replier">Source</a></p>
 </main>
 <script src="lib/tf.min.js"></script>
-<script src="app.js?v=2"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>
